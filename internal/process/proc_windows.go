@@ -3,10 +3,15 @@
 package process
 
 import (
-	"os"
 	"os/exec"
 	"strconv"
 	"syscall"
+)
+
+var (
+	modkernel32     = syscall.NewLazyDLL("kernel32.dll")
+	procOpenProcess = modkernel32.NewProc("OpenProcess")
+	procCloseHandle = modkernel32.NewProc("CloseHandle")
 )
 
 func setDetachAttrs(cmd *exec.Cmd) {
@@ -22,10 +27,30 @@ func killProcess(pid int) {
 }
 
 func isProcessAlive(pid int) bool {
-	handle, err := openProcess(0x00100000, false, uint32(pid)) // PROCESS_QUERY_LIMITED_INFORMATION
+	handle, err := openProcess(0x00100000, false, uint32(pid))
 	if err != nil {
 		return false
 	}
 	closeHandle(handle)
 	return true
+}
+
+func openProcess(desiredAccess uint32, inheritHandle bool, processID uint32) (uintptr, error) {
+	var inherit uintptr
+	if inheritHandle {
+		inherit = 1
+	}
+	handle, _, err := procOpenProcess.Call(
+		uintptr(desiredAccess),
+		inherit,
+		uintptr(processID),
+	)
+	if handle == 0 {
+		return 0, err
+	}
+	return handle, nil
+}
+
+func closeHandle(handle uintptr) {
+	procCloseHandle.Call(handle)
 }
