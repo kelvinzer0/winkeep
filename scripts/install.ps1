@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$REPO = "winkeep/winkeep"
+$REPO = "kelvinzer0/winkeep"
 $INSTALL_DIR = "$env:LOCALAPPDATA\winkeep"
 $BINARY = "winkeep.exe"
 
