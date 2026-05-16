@@ -19,7 +19,10 @@ $version = $null
 try {
     $release = Invoke-RestMethod `
         -Uri "https://api.github.com/repos/$REPO/releases/latest" `
-        -Headers @{ "Accept" = "application/vnd.github.v3+json" } `
+        -Headers @{
+            "Accept"     = "application/vnd.github.v3+json"
+            "User-Agent" = "winkeep-installer"
+        } `
         -TimeoutSec 15
     $version = $release.tag_name
     Write-Host "       Latest version: $version" -ForegroundColor Green
@@ -47,7 +50,12 @@ $destPath = Join-Path $INSTALL_DIR $BINARY
 $downloaded = $false
 try {
     Write-Host "       Trying GitHub..." -ForegroundColor Gray
-    Invoke-WebRequest -Uri $downloadUrl -OutFile $destPath -UseBasicParsing -TimeoutSec 60
+    Invoke-WebRequest `
+        -Uri $downloadUrl `
+        -OutFile $destPath `
+        -UseBasicParsing `
+        -Headers @{ "User-Agent" = "winkeep-installer" } `
+        -TimeoutSec 60
     $downloaded = $true
 } catch {
     Write-Host "       GitHub download failed, trying SourceForge..." -ForegroundColor Yellow
@@ -55,11 +63,16 @@ try {
 
 if (-not $downloaded) {
     try {
-        Invoke-WebRequest -Uri $sfUrl -OutFile $destPath -UseBasicParsing -TimeoutSec 60
+        Invoke-WebRequest `
+            -Uri $sfUrl `
+            -OutFile $destPath `
+            -UseBasicParsing `
+            -Headers @{ "User-Agent" = "winkeep-installer" } `
+            -TimeoutSec 60
         $downloaded = $true
     } catch {
         Write-Host "       All download sources failed." -ForegroundColor Red
-        Write-Host "       Please download manually from: https://sourceforge.net/projects/winkeep/" -ForegroundColor Yellow
+        Write-Host "       Please download manually from: https://github.com/$REPO/releases" -ForegroundColor Yellow
         exit 1
     }
 }
@@ -88,45 +101,8 @@ Write-Host ""
 try {
     & $destPath version
 } catch {
-    Write-Host "  Warning: Could not run winkeep version. The binary may need a terminal restart." -ForegroundColor Yellow
+    Write-Host "  Warning: Could not run 'winkeep version'. Try restarting your terminal." -ForegroundColor Yellow
 }
-Write-Host ""
-Write-Host "  Usage:" -ForegroundColor Cyan
-Write-Host "    winkeep run -- python server.py" -ForegroundColor White
-Write-Host "    winkeep list" -ForegroundColor White
-Write-Host "    winkeep logs <id>" -ForegroundColor White
-Write-Host ""
-Write-Host "  Restart your terminal to use 'winkeep' command." -ForegroundColor Yellow
-Write-Host ""
-try {
-    Invoke-WebRequest -Uri $downloadUrl -OutFile $destPath -UseBasicParsing
-} catch {
-    Write-Host "       GitHub download failed, trying SourceForge..." -ForegroundColor Yellow
-    try {
-        Invoke-WebRequest -Uri $sfUrl -OutFile $destPath -UseBasicParsing
-    } catch {
-        Write-Host "       Download failed!" -ForegroundColor Red
-        Write-Host "       Please download manually from: https://sourceforge.net/projects/winkeep/" -ForegroundColor Yellow
-        exit 1
-    }
-}
-
-# Add to PATH
-Write-Host "[4/4] Adding to PATH..." -ForegroundColor Gray
-$currentPath = [Environment]::GetEnvironmentVariable("Path", "User")
-if ($currentPath -notlike "*$INSTALL_DIR*") {
-    [Environment]::SetEnvironmentVariable("Path", "$currentPath;$INSTALL_DIR", "User")
-    $env:Path = "$env:Path;$INSTALL_DIR"
-    Write-Host "       Added to PATH" -ForegroundColor Green
-} else {
-    Write-Host "       Already in PATH" -ForegroundColor Gray
-}
-
-# Verify
-Write-Host ""
-Write-Host "  Installation complete!" -ForegroundColor Green
-Write-Host ""
-& $destPath version
 Write-Host ""
 Write-Host "  Usage:" -ForegroundColor Cyan
 Write-Host "    winkeep run -- python server.py" -ForegroundColor White
