@@ -1,0 +1,132 @@
+name: Monthly Release
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'  # Every 1st of the month at midnight UTC
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Generate version
+        id: version
+        run: |
+          VERSION="v$(date +%Y.%m.%d)"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Generated version: $VERSION"
+
+      - name: Build Windows AMD64
+        env:
+          GOOS: windows
+          GOARCH: amd64
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          go build -ldflags="-s -w -X main.version=${VERSION}" -o winkeep_windows_amd64.exe ./cmd/winkeep/
+
+      - name: Build Windows 386
+        env:
+          GOOS: windows
+          GOARCH: 386
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          go build -ldflags="-s -w -X main.version=${VERSION}" -o winkeep_windows_386.exe ./cmd/winkeep/
+
+      - name: Build Linux AMD64
+        env:
+          GOOS: linux
+          GOARCH: amd64
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          go build -ldflags="-s -w -X main.version=${VERSION}" -o winkeep_linux_amd64 ./cmd/winkeep/
+
+      - name: Build Linux ARM64
+        env:
+          GOOS: linux
+          GOARCH: arm64
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          go build -ldflags="-s -w -X main.version=${VERSION}" -o winkeep_linux_arm64 ./cmd/winkeep/
+
+      - name: Build macOS AMD64
+        env:
+          GOOS: darwin
+          GOARCH: amd64
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          go build -ldflags="-s -w -X main.version=${VERSION}" -o winkeep_darwin_amd64 ./cmd/winkeep/
+
+      - name: Build macOS ARM64
+        env:
+          GOOS: darwin
+          GOARCH: arm64
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          go build -ldflags="-s -w -X main.version=${VERSION}" -o winkeep_darwin_arm64 ./cmd/winkeep/
+
+      - name: Generate checksums
+        run: |
+          sha256sum winkeep_* > checksums.txt
+          cat checksums.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: WinKeep ${{ steps.version.outputs.version }}
+          body: |
+            ## WinKeep ${{ steps.version.outputs.version }}
+
+            Automated monthly release.
+
+            ### Downloads
+            - Windows AMD64: `winkeep_windows_amd64.exe`
+            - Windows 386: `winkeep_windows_386.exe`
+            - Linux AMD64: `winkeep_linux_amd64`
+            - Linux ARM64: `winkeep_linux_arm64`
+            - macOS AMD64: `winkeep_darwin_amd64`
+            - macOS ARM64: `winkeep_darwin_arm64`
+
+            ### Install via PowerShell
+            ```
+            irm https://winkeep.dev/install.ps1 | iex
+            ```
+          files: |
+            winkeep_windows_amd64.exe
+            winkeep_windows_386.exe
+            winkeep_linux_amd64
+            winkeep_linux_arm64
+            winkeep_darwin_amd64
+            winkeep_darwin_arm64
+            checksums.txt
+          draft: false
+          prerelease: false
+
+      - name: Upload to SourceForge
+        env:
+          SF_USER: ${{ secrets.SOURCEFORGE_USER }}
+          SF_KEY: ${{ secrets.SOURCEFORGE_SSH_KEY }}
+        if: env.SF_USER != ''
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          mkdir -p ~/.ssh
+          echo "$SF_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan frs.sourceforge.net >> ~/.ssh/known_hosts 2>/dev/null
+
+          for f in winkeep_*; do
+            scp "$f" "${SF_USER}@frs.sourceforge.net:/home/frs/project/winkeep/${VERSION}/"
+          done

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinKeep - nohup for Windows</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwindcss.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81' },
+                        dark: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .gradient-text { background: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .glow { box-shadow: 0 0 60px rgba(99, 102, 241, 0.15); }
+        .code-block { background: #0f172a; border: 1px solid #1e293b; }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+    </style>
+</head>
+<body class="bg-dark-950 text-dark-100">
+    <!-- Nav -->
+    <nav class="fixed top-0 w-full z-50 bg-dark-950/80 backdrop-blur-xl border-b border-dark-800/50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <span class="text-xl font-bold text-white">WinKeep</span>
+            </div>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#features" class="text-dark-400 hover:text-white transition">Features</a>
+                <a href="#install" class="text-dark-400 hover:text-white transition">Install</a>
+                <a href="#usage" class="text-dark-400 hover:text-white transition">Usage</a>
+                <a href="https://github.com/winkeep/winkeep" class="text-dark-400 hover:text-white transition">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="min-h-screen flex items-center justify-center px-6 pt-20">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600/10 border border-primary-500/20 rounded-full mb-8">
+                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                <span class="text-sm text-primary-300">Open Source & Free Forever</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
+                <span class="text-white">nohup</span>
+                <span class="gradient-text"> for Windows</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-dark-400 mb-10 max-w-2xl mx-auto">
+                Keep your processes running after SSH disconnects. Like <code class="text-primary-400 font-mono">nohup</code>, but built for Windows.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+                <a href="#install" class="w-full sm:w-auto px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-xl transition-all hover:scale-105 glow">
+                    Download for Windows
+                </a>
+                <div class="code-block rounded-xl px-6 py-4 flex items-center gap-3 w-full sm:w-auto">
+                    <span class="text-dark-500 text-sm">$</span>
+                    <code class="font-mono text-green-400 text-sm">irm https://winkeep.dev/install.ps1 | iex</code>
+                    <button onclick="copyInstall()" class="text-dark-500 hover:text-white transition ml-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Terminal Preview -->
+            <div class="code-block rounded-2xl p-6 max-w-2xl mx-auto text-left glow animate-float">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="text-dark-600 text-sm ml-2">PowerShell</span>
+                </div>
+                <div class="font-mono text-sm space-y-2">
+                    <p><span class="text-dark-500">PS&gt;</span> <span class="text-green-400">winkeep run</span> <span class="text-dark-300">-- python server.py</span></p>
+                    <p class="text-dark-400">Process started in background</p>
+                    <p class="text-dark-400">  ID:   <span class="text-primary-400">python-1715001234</span></p>
+                    <p class="text-dark-400">  PID:  <span class="text-primary-400">12847</span></p>
+                    <p class="text-dark-500 mt-3"># Close SSH... process keeps running!</p>
+                    <p><span class="text-dark-500">PS&gt;</span> <span class="text-green-400">winkeep list</span></p>
+                    <p class="text-dark-300">python-1715001234  python  12847  running  2h15m</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-24 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Why WinKeep?</h2>
+                <p class="text-dark-400 text-lg">Stop losing processes when SSH disconnects</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-dark-900/50 border border-dark-800 rounded-2xl p-8 hover:border-primary-500/30 transition">
+                    <div class="w-12 h-12 bg-primary-600/10 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Background Processes</h3>
+                    <p class="text-dark-400">Run any command in the background. Processes survive SSH disconnects, terminal closures, and network issues.</p>
+                </div>
+                <div class="bg-dark-900/50 border border-dark-800 rounded-2xl p-8 hover:border-primary-500/30 transition">
+                    <div class="w-12 h-12 bg-primary-600/10 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Session Manager</h3>
+                    <p class="text-dark-400">Group related processes into sessions. Manage multiple projects like tmux/screen for Windows.</p>
+                </div>
+                <div class="bg-dark-900/50 border border-dark-800 rounded-2xl p-8 hover:border-primary-500/30 transition">
+                    <div class="w-12 h-12 bg-primary-600/10 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Log Capture</h3>
+                    <p class="text-dark-400">All stdout and stderr are captured to log files. View them anytime with <code class="text-primary-400 font-mono text-sm">winkeep logs</code>.</p>
+                </div>
+                <div class="bg-dark-900/50 border border-dark-800 rounded-2xl p-8 hover:border-primary-500/30 transition">
+                    <div class="w-12 h-12 bg-primary-600/10 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Single Binary</h3>
+                    <p class="text-dark-400">One EXE file, no dependencies. Download and use immediately. No runtime required.</p>
+                </div>
+                <div class="bg-dark-900/50 border border-dark-800 rounded-2xl p-8 hover:border-primary-500/30 transition">
+                    <div class="w-12 h-12 bg-primary-600/10 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Cross-Platform</h3>
+                    <p class="text-dark-400">Works on Windows, Linux, and macOS. Same commands everywhere.</p>
+                </div>
+                <div class="bg-dark-900/50 border border-dark-800 rounded-2xl p-8 hover:border-primary-500/30 transition">
+                    <div class="w-12 h-12 bg-primary-600/10 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Zero Config</h3>
+                    <p class="text-dark-400">Works out of the box. No configuration files to edit, no services to install.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Install -->
+    <section id="install" class="py-24 px-6 bg-dark-900/30">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Install in Seconds</h2>
+                <p class="text-dark-400 text-lg">Choose your preferred installation method</p>
+            </div>
+            <div class="space-y-6">
+                <!-- PowerShell -->
+                <div class="code-block rounded-2xl p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                            <span class="text-blue-400 font-bold text-sm">PS</span>
+                        </div>
+                        <span class="text-white font-semibold">PowerShell (Recommended)</span>
+                    </div>
+                    <div class="font-mono text-sm bg-dark-950 rounded-xl p-4">
+                        <span class="text-dark-500">PS&gt;</span> <span class="text-green-400">irm https://winkeep.dev/install.ps1 | iex</span>
+                    </div>
+                </div>
+                <!-- CMD -->
+                <div class="code-block rounded-2xl p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 bg-gray-600/20 rounded-lg flex items-center justify-center">
+                            <span class="text-gray-400 font-bold text-sm">C</span>
+                        </div>
+                        <span class="text-white font-semibold">Command Prompt</span>
+                    </div>
+                    <div class="font-mono text-sm bg-dark-950 rounded-xl p-4">
+                        <span class="text-dark-500">C:\&gt;</span> <span class="text-green-400">curl -L https://winkeep.dev/install.bat -o install.bat && install.bat</span>
+                    </div>
+                </div>
+                <!-- Manual -->
+                <div class="code-block rounded-2xl p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        </div>
+                        <span class="text-white font-semibold">Manual Download</span>
+                    </div>
+                    <p class="text-dark-400 text-sm mb-4">Download from SourceForge and add to your PATH.</p>
+                    <a href="https://sourceforge.net/projects/winkeep/files/" class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition font-medium">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Download from SourceForge
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Usage -->
+    <section id="usage" class="py-24 px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Usage</h2>
+                <p class="text-dark-400 text-lg">Simple commands, powerful results</p>
+            </div>
+            <div class="space-y-8">
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-4">Run a background process</h3>
+                    <div class="code-block rounded-xl p-5 font-mono text-sm">
+                        <p><span class="text-dark-500">$</span> <span class="text-green-400">winkeep run</span> <span class="text-dark-300">-- python server.py</span></p>
+                        <p><span class="text-dark-500">$</span> <span class="text-green-400">winkeep run</span> <span class="text-dark-300">--name myapp -- node app.js</span></p>
+                        <p><span class="text-dark-500">$</span> <span class="text-green-400">winkeep run</span> <span class="text-dark-300">--session myproject -- npm start</span></p>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-4">Manage processes</h3>
+                    <div class="code-block rounded-xl p-5 font-mono text-sm space-y-1">
+                        <p><span class="text-dark-500">$</span> <span class="text-green-400">winkeep list</span> <span class="text-dark-600"># List all running processes</span></p>
+                        <p><span class="text-dark-500">$</span> <span class="text-green-400">winkeep logs</span> <span class="text-dark-300">python-1715001234</span> <span class="text-dark-600"># View logs</span></p>
+                        <p><span class="text-dark-500">$</span> <span class="text-green-400">winkeep kill</span> <span class="text-dark-300">python-1715001234</span> <span class="text-dark-600"># Stop process</span></p>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-4">Session management</h3>
+                    <div class="code-block rounded-xl p-5 font-mono text-sm space-y-1">
+                        <p><span class="text-dark-500">$</span> <span class="text-green-400">winkeep session create</span> <span class="text-dark-300">myproject</span></p>
+                        <p><span class="text-dark-500">$</span> <span class="text-green-400">winkeep session list</span></p>
+                        <p><span class="text-dark-500">$</span> <span class="text-green-400">winkeep session kill</span> <span class="text-dark-300">myproject</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-dark-800">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-primary-600 rounded-md flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <span class="font-semibold text-white">WinKeep</span>
+                <span class="text-dark-600 text-sm">| nohup for Windows</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="https://github.com/winkeep/winkeep" class="text-dark-400 hover:text-white transition">GitHub</a>
+                <a href="https://sourceforge.net/projects/winkeep/" class="text-dark-400 hover:text-white transition">SourceForge</a>
+                <span class="text-dark-600 text-sm">MIT License</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function copyInstall() {
+            navigator.clipboard.writeText('irm https://winkeep.dev/install.ps1 | iex');
+        }
+    </script>
+</body>
+</html>
